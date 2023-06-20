@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil</title>
+</head>
+<body>
+    <h1>Bem vindo, <%= username %></h1>
+    <p><%= description %></p>
+    <form action="/profile" method="post">
+        <input type="text" name="username" placeholder="Editar nome">
+        <input type="password" name="password" placeholder="Editar senha"> <br>
+        <textarea name="description" cols="55" rows="10" placeholder="Editar descrição"></textarea> <br>
+        <input type="password" name="currentlyPassword" placeholder="Senha atual" minlength="8">
+        <input type="submit" value="Editar">
+    </form>
+    <a href="/">Voltar</a>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+    <script>
+        document.getElementsByTagName('form')[0].addEventListener('submit', event => {
+            event.preventDefault()
+            let data = {
+                username: document.getElementsByName('username')[0].value,
+                password: document.getElementsByName('password')[0].value,
+                description: document.getElementsByName('description')[0].value,
+                currentlyPassword: CryptoJS.MD5(document.getElementsByName('currentlyPassword')[0].value).toString()
+            }
+            for (element in data) {
+                if (data[element].length == 0) {
+                    delete data[element]
+                }
+            }
+            if (data.password) data.password = CryptoJS.MD5(data.password).toString()
+            fetch(document.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(data)
+            })
+            .then(result => {
+                if (result.redirected) document.location.href = result.url
+                result.text().then(error => {
+                    document.getElementsByTagName('form')[0].reset()
+                    let p = document.createElement('p')
+                    p.setAttribute('id', 'error')
+                    p.innerText = error
+                    if (!document.getElementById('error')) document.body.appendChild(p)
+                })
+            })
+            .catch(err => console.log(err))
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form action="/login" method="post">
+        <input type="text" name="username" placeholder="Nome">
+        <input type="password" name="password" placeholder="Senha">
+        <input type="submit" value="Login">
+    </form>
+    <br>
+    <a href="/">Voltar</a>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/md5.js"></script>
+    <script>
+        document.getElementsByTagName('form')[0].addEventListener('submit', event => {
+            event.preventDefault()
+            let username = document.getElementsByName('username')[0].value
+            let password = document.getElementsByName('password')[0].value
+            const hashPassword = CryptoJS.MD5(password).toString()
+            const data = {
+                username: username,
+                hashPassword: hashPassword
+            }
+            fetch(document.location.href, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(data)
+            })
+            .then(result => {
+                if (result.redirected) {
+                    document.location.href = result.url
+                }
+                result.text().then(error => {
+                    document.getElementsByTagName('form')[0].reset()
+                    let p = document.createElement('p')
+                    p.setAttribute('id', 'error')
+                    p.innerText = error
+                    if (!document.getElementById('error')) document.body.appendChild(p)
+                })
+            })
+        })
+    </script>
+</body>
+</html>
