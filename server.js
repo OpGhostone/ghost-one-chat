@@ -130,4 +130,4 @@ app.post('/profile', async (req, res) => {
     else res.send('Senha incorreta')
 })
 
-http.listen(port, () => console.log('Server listening in '+port))
+http.listen(port, '0.0.0.0', () => console.log('Server listening in '+port))
